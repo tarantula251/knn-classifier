@@ -9,15 +9,18 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ArticleReader extends ExtractReuters {
-    private Pattern EXTRACTION_PATTERN = Pattern.compile("<TITLE>(.*?)</TITLE>|<PLACES><D>(.*?)</D></PLACES>|<BODY>(.*?)</BODY>");
+    private Pattern EXTRACTION_PATTERN = Pattern.compile("<PLACES><D>(west-germany|usa|france|uk|canada|japan)</D></PLACES>|<BODY>(.+?)</BODY>");
     private static String[] META_CHARS = new String[]{"&", "<", ">", "\"", "'", "", ";"};
     private static String[] META_CHARS_SERIALIZATIONS = new String[]{"&amp;", "&lt;", "&gt;", "&quot;", "&apos;", "<D>", "</D>"};
-    private Path inputDir;
-    private Path outputDir;
+    private static HashSet<String> COUNTRY_FILTER_VALUES = new HashSet<String>(Arrays.asList("west-germany", "usa", "france", "uk", "canada", "japan"));
+    final private Path inputDir;
+    final private Path outputDir;
 
     public ArticleReader(Path inputDir, Path outputDir) throws IOException {
         super(inputDir, outputDir);
@@ -82,12 +85,22 @@ public class ArticleReader extends ExtractReuters {
                                 out = out.replaceAll(META_CHARS_SERIALIZATIONS[i], META_CHARS[i]);
                             }
 
-                            Path outFile = this.outputDir.resolve(sgmFile.getFileName() + "-" + var7++ + ".txt");
-                            BufferedWriter writer = Files.newBufferedWriter(outFile, StandardCharsets.UTF_8);
+                            String[] text = out.split(System.lineSeparator(), 2);
+                            String country = null;
+                            String body = null;
+                            if (text != null && text.length > 1) {
+                                country = text[0].trim();
+                                body = text[1].trim();
+                            }
+                            BufferedWriter writer = null;
+                            if (country != null && !country.isBlank() && body != null && !body.isBlank() && COUNTRY_FILTER_VALUES.contains(country)) {
+                                Path outFile = this.outputDir.resolve(sgmFile.getFileName() + "-" + var7++ + ".txt");
+                                writer = Files.newBufferedWriter(outFile, StandardCharsets.UTF_8);
+                            }
                             Throwable var12 = null;
 
                             try {
-                                writer.write(out);
+                                if (writer != null) writer.write(out);
                             } catch (Throwable var37) {
                                 var12 = var37;
                                 throw var37;
