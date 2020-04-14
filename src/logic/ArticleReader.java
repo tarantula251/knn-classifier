@@ -15,12 +15,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ArticleReader extends ExtractReuters {
-    private Pattern EXTRACTION_PATTERN = Pattern.compile("<PLACES><D>(west-germany|usa|france|uk|canada|japan)</D></PLACES>|<BODY>(.+?)</BODY>");
-    private static String[] META_CHARS = new String[]{"&", "<", ">", "\"", "'", "", ";"};
-    private static String[] META_CHARS_SERIALIZATIONS = new String[]{"&amp;", "&lt;", "&gt;", "&quot;", "&apos;", "<D>", "</D>"};
-    private static HashSet<String> COUNTRY_FILTER_VALUES = new HashSet<String>(Arrays.asList("west-germany", "usa", "france", "uk", "canada", "japan"));
+    private final Pattern EXTRACTION_PATTERN = Pattern.compile("<PLACES><D>(.+?)</D></PLACES>|<BODY>(.+?)</BODY>");
+    private static final String[] META_CHARS = new String[]{"&", "<", ">", "\"", "'", "", ";"};
+    private static final String[] META_CHARS_SERIALIZATIONS = new String[]{"&amp;", "&lt;", "&gt;", "&quot;", "&apos;", "<D>", "</D>"};
+    private static final HashSet<String> COUNTRY_FILTER_VALUES = new HashSet<String>(Arrays.asList("west-germany", "usa", "france", "uk", "canada", "japan"));
     final private Path inputDir;
     final private Path outputDir;
+    private static final String SEMICOLON_CHAR = ";";
 
     public ArticleReader(Path inputDir, Path outputDir) throws IOException {
         super(inputDir, outputDir);
@@ -86,16 +87,27 @@ public class ArticleReader extends ExtractReuters {
                             }
 
                             String[] text = out.split(System.lineSeparator(), 2);
-                            String country = null;
                             String body = null;
-                            if (text != null && text.length > 1) {
-                                country = text[0].trim();
+                            String[] countryArray = null;
+                            if (text.length > 1) {
+                                countryArray = text[0].trim().split(SEMICOLON_CHAR);
                                 body = text[1].trim();
                             }
                             BufferedWriter writer = null;
-                            if (country != null && !country.isBlank() && body != null && !body.isBlank() && COUNTRY_FILTER_VALUES.contains(country)) {
-                                Path outFile = this.outputDir.resolve(sgmFile.getFileName() + "-" + var7++ + ".txt");
-                                writer = Files.newBufferedWriter(outFile, StandardCharsets.UTF_8);
+                            if (body != null && !body.isBlank() && countryArray.length > 0) {
+                                boolean isCountryAllowed = false;
+                                for (String ctr : countryArray) {
+                                    isCountryAllowed = false;
+                                    if (COUNTRY_FILTER_VALUES.contains(ctr)) {
+                                        isCountryAllowed = true;
+                                    } else {
+                                        break;
+                                    }
+                                }
+                                if (isCountryAllowed) {
+                                    Path outFile = this.outputDir.resolve(sgmFile.getFileName() + "-" + var7++ + ".txt");
+                                    writer = Files.newBufferedWriter(outFile, StandardCharsets.UTF_8);
+                                }
                             }
                             Throwable var12 = null;
 
