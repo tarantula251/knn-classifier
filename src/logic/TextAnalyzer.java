@@ -21,9 +21,8 @@ public class TextAnalyzer {
     private ArrayList<File> dataFiles;
     private static final String BODY_END = "reuter &#3;";
     private static final String SEMICOLON_CHAR = ";";
-    public ArrayList<Article> articlesCollection = new ArrayList<Article>();
 
-    public void readBody() throws IOException {
+    public ArrayList<Article> readBody() throws IOException {
         System.out.println("Started reading files.");
         if (dataDirAsFile != null && dataDirAsFile.isDirectory()) {
             dataFiles = new ArrayList<>();
@@ -33,15 +32,20 @@ public class TextAnalyzer {
                 }
             }
         }
+        ArrayList<Article> articlesCollection = new ArrayList<>();
         if (dataFiles != null && !dataFiles.isEmpty()) {
             System.out.println("Stemming in progress...");
+            int articleCounter = 1;
             for (File dataFile : dataFiles) {
                 Scanner scanner = new Scanner(dataFile);
                 Article article = new Article();
                 while (scanner.hasNextLine()) {
+                    int articleId = articleCounter;
                     String placeLine = scanner.nextLine();
                     String emptyLine = scanner.nextLine();
                     String bodyLine = scanner.nextLine();
+
+                    article.setId(articleId);
 
                     article.setOriginalBody(bodyLine);
 
@@ -56,10 +60,11 @@ public class TextAnalyzer {
                     break;
                 }
                 articlesCollection.add(article);
+                articleCounter++;
             }
-            System.out.println("art size "+articlesCollection.size());
         }
-        System.out.println("Reading finished!");
+        System.out.println("Successfully read " + articlesCollection.size() + " articles.");
+        return articlesCollection;
     }
 
     private ArrayList<String> stem(String inputText) throws IOException {

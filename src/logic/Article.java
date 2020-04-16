@@ -3,6 +3,7 @@ package logic;
 import java.util.ArrayList;
 
 public class Article {
+    public int id;
     private String originalBody;
     private ArrayList<String> places;
     private ArrayList<String> bodyTokens;
@@ -13,6 +14,14 @@ public class Article {
         this.originalBody = originalBody;
         this.places = places;
         this.bodyTokens = bodyTokens;
+    }
+
+    public void setId(int articleId) {
+        this.id = articleId;
+    }
+
+    public int getArticleId() {
+        return this.id;
     }
 
     public void setOriginalBody(String originalBody) {
