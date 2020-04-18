@@ -34,6 +34,7 @@ public class ArticleReader extends ExtractReuters {
         if (!directory.exists()){
             directory.mkdir();
             directory.setReadable(true);
+            directory.setWritable(true);
         }
     }
 

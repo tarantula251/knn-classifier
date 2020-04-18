@@ -7,6 +7,7 @@ public class Article {
     private String originalBody;
     private ArrayList<String> places;
     private ArrayList<String> bodyTokens;
+    private ArrayList<Double> features;
 
     public Article() {}
 
@@ -46,5 +47,13 @@ public class Article {
 
     public ArrayList<String> getBodyTokens() {
         return this.bodyTokens;
+    }
+
+    public void setFeatures(ArrayList<Double> features) {
+        this.features = features;
+    }
+
+    public ArrayList<Double> getFeatures() {
+        return this.features;
     }
 }

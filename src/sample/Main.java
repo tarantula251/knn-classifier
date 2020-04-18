@@ -1,6 +1,7 @@
 package sample;
 
 import javafx.application.Application;
+import javafx.scene.shape.ArcTo;
 import javafx.stage.Stage;
 import logic.*;
 
@@ -33,10 +34,12 @@ public class Main extends Application {
         TfidfAnalyzer tfidfAnalyzer = new TfidfAnalyzer();
         HashMap<Integer, HashMap<String, Double>> articleTfidfMap = tfidfAnalyzer.analyze(articlesCollection);
 
-        // sort article => TF IDF map
-        articleTfidfMap = Utils.sortArticleTfidfMapDesc(articleTfidfMap);
+        // pick keywords for each article in collection
+        HashMap<Integer, ArrayList<String>> articleKeywords = Utils.pickKeywords(articleTfidfMap);
 
-        // generate keywords for each article in collection
+        // set features vector on each article
+        FeatureExtractor featureExtractor = new FeatureExtractor();
+        featureExtractor.extract(articlesCollection, articleKeywords);
 
         System.exit(0);
     }
