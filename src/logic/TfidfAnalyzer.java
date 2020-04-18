@@ -6,8 +6,10 @@ import org.apache.commons.collections4.CollectionUtils;
 
 public class TfidfAnalyzer {
 
-    public void analyze(ArrayList<Article> articlesCollection) {
+    public HashMap<Integer, HashMap<String, Double>> analyze(ArrayList<Article> articlesCollection) {
+        System.out.println("Started TF IDF analyzer.");
         if (articlesCollection != null && !articlesCollection.isEmpty()) {
+            System.out.println("TF IDF calculation in progress...");
             HashMap<Integer, HashMap<String, Double>> articleIdTfMap = new HashMap<Integer, HashMap<String, Double>>();
             for (Article article : articlesCollection) {
                 HashMap<String, Double> tfMap = calculateTf(article);
@@ -36,12 +38,14 @@ public class TfidfAnalyzer {
                     double tfidfValue = tfValue * idfValue;
                     tokenTfidfPerArticleMap.put(token, tfidfValue);
                 }
-                // TODO extract keywords
                 articleTfidfMap.put(articleId, tokenTfidfPerArticleMap);
             }
+            System.out.println("Successfully analyzed " + articlesCollection.size() + " articles with TF IDF analyzer.");
+            return articleTfidfMap;
         } else {
             System.out.println("Articles collection is empty!");
         }
+        return null;
     }
 
     private HashMap<String, Double> calculateTf(Article article) {

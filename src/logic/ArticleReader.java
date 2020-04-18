@@ -33,6 +33,7 @@ public class ArticleReader extends ExtractReuters {
         File directory = new File(path.toString());
         if (!directory.exists()){
             directory.mkdir();
+            directory.setReadable(true);
         }
     }
 

@@ -2,14 +2,11 @@ package sample;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
-import logic.Article;
-import logic.ArticleReader;
-import logic.TextAnalyzer;
-import logic.TfidfAnalyzer;
+import logic.*;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.util.*;
 
 public class Main extends Application {
 
@@ -23,19 +20,25 @@ public class Main extends Application {
 
         // convert sgm files to txt and filter them
         String projectDir = Paths.get("").toAbsolutePath().toString();
-        Path outputDir = Paths.get(projectDir + "\\data_txt");
+        Path outputDir = Paths.get(projectDir + "\\data_txt").toAbsolutePath();
         ArticleReader.checkIfDirExists(outputDir);
-        ArticleReader reader = new ArticleReader(Paths.get(projectDir + "\\data_sgm"), outputDir);
+        ArticleReader reader = new ArticleReader(Paths.get(projectDir + "\\data_sgm").toAbsolutePath(), outputDir);
         reader.extract();
 
         // stem text and generate articles collection
         TextAnalyzer textAnalyzer = new TextAnalyzer();
         ArrayList<Article> articlesCollection = textAnalyzer.readBody();
 
-        // generate keywords for each article in collection
+        // calculate TF IDF value for tokens in each article
         TfidfAnalyzer tfidfAnalyzer = new TfidfAnalyzer();
-        tfidfAnalyzer.analyze(articlesCollection);
+        HashMap<Integer, HashMap<String, Double>> articleTfidfMap = tfidfAnalyzer.analyze(articlesCollection);
 
+        // sort article => TF IDF map
+        articleTfidfMap = Utils.sortArticleTfidfMapDesc(articleTfidfMap);
+
+        // generate keywords for each article in collection
+
+        System.exit(0);
     }
 
     public static void main(String[] args) {
