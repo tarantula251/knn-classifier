@@ -1,12 +1,15 @@
 package logic;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toMap;
 
 public class Utils {
     private final static double KEYWORDS_LIMIT_PERCENT = 0.6;
+    // knn metric names
+    public final static String KNN_METRIC_EUCLIDEAN = "Euclidean";
+    public final static String KNN_METRIC_MANHATTAN = "Manhattan";
+    public final static String KNN_METRIC_CHEBYSHEV = "Chebyshev";
 
     public static HashMap<String, Double> sortTfidfMapDesc(HashMap<String, Double> tfidfMap) {
         HashMap<String, Double> tfidfMapSorted = tfidfMap

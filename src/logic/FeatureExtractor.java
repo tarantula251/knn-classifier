@@ -47,7 +47,11 @@ public class FeatureExtractor {
             featuresList.add(keywordsFirstHalf);
             featuresList.add(keywordsDensity);
 
-            article.setFeatures(featuresList);
+            double[] featuresArray = featuresList
+                    .stream()
+                    .mapToDouble(Double::doubleValue)
+                    .toArray();
+            article.setFeatures(featuresArray);
         }
     }
 

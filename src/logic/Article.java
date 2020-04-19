@@ -7,7 +7,8 @@ public class Article {
     private String originalBody;
     private ArrayList<String> places;
     private ArrayList<String> bodyTokens;
-    private ArrayList<Double> features;
+    private double[] features;
+    private ArrayList<String> knnEuclideanPlaces;
 
     public Article() {}
 
@@ -49,11 +50,19 @@ public class Article {
         return this.bodyTokens;
     }
 
-    public void setFeatures(ArrayList<Double> features) {
+    public void setFeatures(double[] features) {
         this.features = features;
     }
 
-    public ArrayList<Double> getFeatures() {
+    public double[] getFeatures() {
         return this.features;
+    }
+
+    public void setKnnEuclideanPlaces(ArrayList<String> knnEuclideanPlaces) {
+        this.knnEuclideanPlaces = knnEuclideanPlaces;
+    }
+
+    public ArrayList<String> getKnnEuclideanPlaces() {
+        return this.knnEuclideanPlaces;
     }
 }

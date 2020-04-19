@@ -10,6 +10,20 @@ import java.nio.file.Paths;
 import java.util.*;
 
 public class Main extends Application {
+    // available features
+    private final static String SHORT_COUNT_KEY = "short";
+    private final static String MEDIUM_COUNT_KEY = "medium";
+    private final static String LONG_COUNT_KEY = "long";
+    private final static String AVERAGE_LENGTH_KEY = "average";
+    private final static String NUMERICAL_COUNT_KEY = "numerical";
+    private final static String KEYWORDS_ALL_COUNT_KEY = "keywordsAll";
+    private final static String KEYWORDS_FIRST_HALF_COUNT_KEY = "keywordsFirstHalf";
+    private final static String KEYWORDS_DENSITY_KEY = "keywordsDensity";
+    // user input for knn classifier, TODO implement it in GUI
+    private static int K_NEIGHBOURS_COUNT = 3;
+    private static double MASTER_DATASET_DELIMITER = 0.6;
+    private static ArrayList<String> KNN_SELECTED_FEATURES;
+    private static String KNN_SELECTED_METRIC = Utils.KNN_METRIC_EUCLIDEAN;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -40,6 +54,15 @@ public class Main extends Application {
         // set features vector on each article
         FeatureExtractor featureExtractor = new FeatureExtractor();
         featureExtractor.extract(articlesCollection, articleKeywords);
+
+        // knn classification
+        KNN_SELECTED_FEATURES = new ArrayList<String>(10);
+        KNN_SELECTED_FEATURES.add(SHORT_COUNT_KEY);
+        KNN_SELECTED_FEATURES.add(KEYWORDS_DENSITY_KEY);
+        if (!KNN_SELECTED_FEATURES.isEmpty()) {
+            KnnClassifier knnClassifier = new KnnClassifier(K_NEIGHBOURS_COUNT, MASTER_DATASET_DELIMITER, KNN_SELECTED_FEATURES, KNN_SELECTED_METRIC, articlesCollection);
+            knnClassifier.classify();
+        }
 
         System.exit(0);
     }
