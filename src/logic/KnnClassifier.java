@@ -1,9 +1,6 @@
 package logic;
 
-import logic.metrics.CanberraMetric;
-import logic.metrics.ChebyshevMetric;
-import logic.metrics.EuclideanMetric;
-import logic.metrics.ManhattanMetric;
+import logic.metrics.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.math3.distribution.NormalDistribution;
@@ -77,13 +74,25 @@ public class KnnClassifier {
         HashMap<Article, Double> masterArticleDistanceMap = getMasterArticleDistanceMap(testArticle);
         if (!masterArticleDistanceMap.isEmpty()) {
             // get k neighbouring article maps
-            HashMap<Article, Double> neighbourDistanceMap = masterArticleDistanceMap
-                    .entrySet()
-                    .stream()
-                    .sorted(Map.Entry.comparingByValue())
-                    .limit(k)
-                    .collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2,
-                            LinkedHashMap::new));
+            HashMap<Article, Double> neighbourDistanceMap = new HashMap<Article, Double>();
+            // the higher correlation coefficient is, the more similar both articles are
+            if (metricName.equals(Utils.KNN_METRIC_CORRELATION_COEFFICIENT)) {
+                neighbourDistanceMap = masterArticleDistanceMap
+                        .entrySet()
+                        .stream()
+                        .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+                        .limit(k)
+                        .collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2,
+                                LinkedHashMap::new));
+            } else {
+                neighbourDistanceMap = masterArticleDistanceMap
+                        .entrySet()
+                        .stream()
+                        .sorted(Map.Entry.comparingByValue())
+                        .limit(k)
+                        .collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2,
+                                LinkedHashMap::new));
+            }
             ArrayList<String> classifiedPlaces = new ArrayList<String>();
             if (neighbourDistanceMap.size() > 0) {
                 classifiedPlaces = getClassifiedPlaces(neighbourDistanceMap.keySet());
@@ -117,6 +126,9 @@ public class KnnClassifier {
         } else if (metricName.equals(Utils.KNN_METRIC_CANBERRA)) {
             CanberraMetric canberraMetric = new CanberraMetric();
             masterArticleDistanceMap = canberraMetric.measureDistance(testArticle, masterArticles, selectedFeaturesIndices);
+        } else if (metricName.equals(Utils.KNN_METRIC_CORRELATION_COEFFICIENT)) {
+            CorrelationCoefficientMetric correlationCoefficientMetric = new CorrelationCoefficientMetric();
+            masterArticleDistanceMap = correlationCoefficientMetric.measureDistance(testArticle, masterArticles, selectedFeaturesIndices);
         }
         return masterArticleDistanceMap;
     }

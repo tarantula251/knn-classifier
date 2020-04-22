@@ -11,6 +11,7 @@ public class Utils {
     public final static String KNN_METRIC_MANHATTAN = "Manhattan";
     public final static String KNN_METRIC_CHEBYSHEV = "Chebyshev";
     public final static String KNN_METRIC_CANBERRA = "Canberra";
+    public final static String KNN_METRIC_CORRELATION_COEFFICIENT = "Correlation Coefficient";
     // features
     private final static String TOKENS = "Count of all tokens in an article";
     private final static String UNIQUE_TOKENS = "Count of unique tokens in an article";
@@ -89,5 +90,13 @@ public class Utils {
             }
         }
         return indexArray;
+    }
+
+    public static double calculateMean(double[] vector) {
+        double mean = 0;
+        for (double val : vector) {
+            mean += val;
+        }
+        return mean / vector.length;
     }
 }
