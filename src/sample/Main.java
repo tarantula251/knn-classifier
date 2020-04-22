@@ -20,7 +20,7 @@ public class Main extends Application {
     private static int K_NEIGHBOURS_COUNT = 3;
     private static double MASTER_DATASET_DELIMITER = 0.6;
     private static ArrayList<String> KNN_SELECTED_FEATURES;
-    private static String KNN_SELECTED_METRIC = Utils.KNN_METRIC_CHEBYSHEV;
+    private static String KNN_SELECTED_METRIC = Utils.KNN_METRIC_CANBERRA;
 
     @Override
     public void start(Stage primaryStage) throws Exception{

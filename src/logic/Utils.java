@@ -10,6 +10,7 @@ public class Utils {
     public final static String KNN_METRIC_EUCLIDEAN = "Euclidean";
     public final static String KNN_METRIC_MANHATTAN = "Manhattan";
     public final static String KNN_METRIC_CHEBYSHEV = "Chebyshev";
+    public final static String KNN_METRIC_CANBERRA = "Canberra";
     // features
     private final static String TOKENS = "Count of all tokens in an article";
     private final static String UNIQUE_TOKENS = "Count of unique tokens in an article";
