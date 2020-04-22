@@ -1,5 +1,6 @@
 package logic;
 
+import logic.metrics.ChebyshevMetric;
 import logic.metrics.EuclideanMetric;
 import logic.metrics.ManhattanMetric;
 import org.apache.commons.collections4.CollectionUtils;
@@ -109,6 +110,9 @@ public class KnnClassifier {
         } else if (metricName.equals(Utils.KNN_METRIC_MANHATTAN)) {
             ManhattanMetric manhattanMetric = new ManhattanMetric();
             masterArticleDistanceMap = manhattanMetric.measureDistance(testArticle, masterArticles, selectedFeaturesIndices);
+        } else if (metricName.equals(Utils.KNN_METRIC_CHEBYSHEV)) {
+            ChebyshevMetric chebyshevMetric = new ChebyshevMetric();
+            masterArticleDistanceMap = chebyshevMetric.measureDistance(testArticle, masterArticles, selectedFeaturesIndices);
         }
         return masterArticleDistanceMap;
     }
