@@ -3,6 +3,10 @@ package sample;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import logic.*;
+import logic.text_processing.ArticleReader;
+import logic.text_processing.TextAnalyzer;
+import logic.tokens_processing.FeatureExtractor;
+import logic.tokens_processing.TfidfAnalyzer;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -16,7 +20,7 @@ public class Main extends Application {
     private static int K_NEIGHBOURS_COUNT = 3;
     private static double MASTER_DATASET_DELIMITER = 0.6;
     private static ArrayList<String> KNN_SELECTED_FEATURES;
-    private static String KNN_SELECTED_METRIC = Utils.KNN_METRIC_EUCLIDEAN;
+    private static String KNN_SELECTED_METRIC = Utils.KNN_METRIC_MANHATTAN;
 
     @Override
     public void start(Stage primaryStage) throws Exception{

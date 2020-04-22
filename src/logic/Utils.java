@@ -78,7 +78,7 @@ public class Utils {
         indexFeatureMap.put(7, KEYWORDS);
         indexFeatureMap.put(8, KEYWORDS_FIRST_HALF);
         indexFeatureMap.put(9, KEYWORDS_DENSITY);
-        int[] indexArray = new int[10];
+        int[] indexArray = new int[selectedFeatures.size()];
         int counter = 0;
         for (int featureKey : indexFeatureMap.keySet()) {
             String featureVal = indexFeatureMap.get(featureKey);

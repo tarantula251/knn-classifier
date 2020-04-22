@@ -1,7 +1,8 @@
-package logic;
+package logic.tokens_processing;
 
 import java.util.*;
 
+import logic.Article;
 import org.apache.commons.collections4.CollectionUtils;
 
 public class TfidfAnalyzer {

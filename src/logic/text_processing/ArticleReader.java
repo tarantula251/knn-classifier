@@ -1,4 +1,4 @@
-package logic;
+package logic.text_processing;
 
 import org.apache.lucene.benchmark.utils.ExtractReuters;
 

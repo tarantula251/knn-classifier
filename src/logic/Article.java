@@ -9,6 +9,7 @@ public class Article {
     private ArrayList<String> bodyTokens;
     private double[] features;
     private ArrayList<String> knnEuclideanPlaces;
+    private ArrayList<String> knnManhattanPlaces;
 
     public Article() {}
 
@@ -62,6 +63,18 @@ public class Article {
         this.knnEuclideanPlaces = knnEuclideanPlaces;
     }
 
+    public ArrayList<String> getKnnEuclideanPlaces() {
+        return this.knnEuclideanPlaces;
+    }
+
+    public void setKnnManhattanPlaces(ArrayList<String> knnManhattanPlaces) {
+        this.knnManhattanPlaces = knnManhattanPlaces;
+    }
+
+    public ArrayList<String> getKnnManhattanPlaces() {
+        return this.knnManhattanPlaces;
+    }
+
     public double[] getFeaturesByIndices(int[] indexArray) {
         double[] featuresArray = new double[indexArray.length];
         int counter = 0;
@@ -70,9 +83,5 @@ public class Article {
             counter++;
         }
         return featuresArray;
-    }
-
-    public ArrayList<String> getKnnEuclideanPlaces() {
-        return this.knnEuclideanPlaces;
     }
 }
