@@ -62,6 +62,16 @@ public class Article {
         this.knnEuclideanPlaces = knnEuclideanPlaces;
     }
 
+    public double[] getFeaturesByIndices(int[] indexArray) {
+        double[] featuresArray = new double[indexArray.length];
+        int counter = 0;
+        for (int index : indexArray) {
+            featuresArray[counter] = this.features[index];
+            counter++;
+        }
+        return featuresArray;
+    }
+
     public ArrayList<String> getKnnEuclideanPlaces() {
         return this.knnEuclideanPlaces;
     }

@@ -14,11 +14,13 @@ public class EuclideanMetric {
     private Article testArticle;
     private ArrayList<Article> masterArticles;
     private int k;
+    private int[] selectedFeaturesIndices;
 
-    public EuclideanMetric(Article testArticle, ArrayList<Article> masterArticles, int k) {
+    public EuclideanMetric(Article testArticle, ArrayList<Article> masterArticles, int k, int[] selectedFeaturesIndices) {
         this.testArticle = testArticle;
         this.masterArticles = masterArticles;
         this.k = k;
+        this.selectedFeaturesIndices = selectedFeaturesIndices;
     }
 
     public void compute() {
@@ -48,8 +50,10 @@ public class EuclideanMetric {
     private HashMap<Article, Double> measureDistance() {
         DistanceMeasure euclideanMetric = new EuclideanDistance();
         HashMap<Article, Double> masterArticleDistanceMap = new HashMap<Article, Double>();
+        double[] testFeatures = testArticle.getFeaturesByIndices(selectedFeaturesIndices);
         for (Article masterArticle : masterArticles) {
-            double distance = euclideanMetric.compute(testArticle.getFeatures(), masterArticle.getFeatures());
+            double[] masterFeatures = masterArticle.getFeaturesByIndices(selectedFeaturesIndices);
+            double distance = euclideanMetric.compute(testFeatures, masterFeatures);
             masterArticleDistanceMap.put(masterArticle, distance);
         }
         return masterArticleDistanceMap;

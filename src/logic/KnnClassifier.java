@@ -8,24 +8,22 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import java.util.*;
 
 public class KnnClassifier {
-    private int k;
-    private double masterDatasetDelimiter;
-    private ArrayList<String> selectedFeatures;
-    private String metricName;
-    private ArrayList<Article> articlesCollection;
+    private final int k;
+    private int[] selectedFeaturesIndices;
+    private final String metricName;
+    private final ArrayList<Article> articlesCollection;
     private ArrayList<Article> masterArticles;
     private ArrayList<Article> testArticles;
 
     public KnnClassifier(int k, double masterDatasetDelimiter, ArrayList<String> selectedFeatures, String metricName, ArrayList<Article> articlesCollection) {
         this.k = k;
-        this.masterDatasetDelimiter = masterDatasetDelimiter;
-        this.selectedFeatures = selectedFeatures;
+        this.selectedFeaturesIndices = Utils.getTokensIndices(selectedFeatures);
         this.metricName = metricName;
         this.articlesCollection = articlesCollection;
+        splitArticles(masterDatasetDelimiter);
     }
 
-    public void classify() {
-        normalizeFeatures();
+    private void splitArticles(double masterDatasetDelimiter) {
         // divide collection to master and test datasets
         Collections.shuffle(articlesCollection);
         int masterArticlesSize = (int) ((double) articlesCollection.size() * masterDatasetDelimiter);
@@ -33,6 +31,10 @@ public class KnnClassifier {
         // save extracted sets of articles
         masterArticles = new ArrayList<>(articlesSplit.get(0));
         testArticles = new ArrayList<>(articlesSplit.get(1));
+    }
+
+    public void classify() {
+        normalizeFeatures();
         // perform classification
         for (Article testArticle : testArticles) {
             classify(testArticle);
@@ -63,7 +65,7 @@ public class KnnClassifier {
 
     private void classify(Article testArticle) {
         if (metricName.equals(Utils.KNN_METRIC_EUCLIDEAN)) {
-            EuclideanMetric euclideanMetric = new EuclideanMetric(testArticle, masterArticles, k);
+            EuclideanMetric euclideanMetric = new EuclideanMetric(testArticle, masterArticles, k, selectedFeaturesIndices);
             euclideanMetric.compute();
         }
     }
