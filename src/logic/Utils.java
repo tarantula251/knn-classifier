@@ -13,16 +13,16 @@ public class Utils {
     public final static String KNN_METRIC_CANBERRA = "Canberra";
     public final static String KNN_METRIC_CORRELATION_COEFFICIENT = "Correlation Coefficient";
     // features
-    private final static String TOKENS = "Count of all tokens in an article";
-    private final static String UNIQUE_TOKENS = "Count of unique tokens in an article";
-    private final static String SHORT_TOKENS = "Count of short tokens in an article (length up to 3 chars)";
-    private final static String MEDIUM_TOKENS = "Count of medium tokens in an article (length between 4 and 7 chars)";
-    private final static String LONG_TOKENS = "Count of long tokens in an article (length greater or equal 8 chars)";
-    private final static String AVERAGE_LENGTH = "Average length of tokens in an article";
-    private final static String NUMERICAL_TOKENS = "Count of tokens representing a numerical value in an article";
-    private final static String KEYWORDS = "Count of tokens which are keywords in an article";
-    private final static String KEYWORDS_FIRST_HALF = "Count of tokens which are keywords and appear in the first half of an article";
-    private final static String KEYWORDS_DENSITY = "Density of keywords in an article";
+    public final static String TOKENS = "Count of all tokens in an article";
+    public final static String UNIQUE_TOKENS = "Count of unique tokens in an article";
+    public final static String SHORT_TOKENS = "Count of short tokens in an article (length up to 3 chars)";
+    public final static String MEDIUM_TOKENS = "Count of medium tokens in an article (length between 4 and 7 chars)";
+    public final static String LONG_TOKENS = "Count of long tokens in an article (length greater or equal 8 chars)";
+    public final static String AVERAGE_LENGTH = "Average length of tokens in an article";
+    public final static String NUMERICAL_TOKENS = "Count of tokens representing a numerical value in an article";
+    public final static String KEYWORDS = "Count of tokens which are keywords in an article";
+    public final static String KEYWORDS_FIRST_HALF = "Count of tokens which are keywords and appear in the first half of an article";
+    public final static String KEYWORDS_DENSITY = "Density of keywords in an article";
 
     public static HashMap<String, Double> sortTfidfMapDesc(HashMap<String, Double> tfidfMap) {
         HashMap<String, Double> tfidfMapSorted = tfidfMap

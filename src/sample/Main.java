@@ -13,16 +13,12 @@ import java.nio.file.Paths;
 import java.util.*;
 
 public class Main extends Application {
-    // for test purpose
-    private final static String SHORT_TOKENS = "Count of short tokens in an article (length up to 3 chars)";
-    private final static String AVERAGE_LENGTH = "Average length of tokens in an article";
-    private final static String KEYWORDS_FIRST_HALF = "Count of tokens which are keywords and appear in the first half of an article";
-    private final static String UNIQUE_TOKENS = "Count of unique tokens in an article";
+    private final static String PROJECT_DIRECTORY = Paths.get("").toAbsolutePath().toString();
     // user input for knn classifier, TODO implement it in GUI
-    private static int K_NEIGHBOURS_COUNT = 3;
+    private static int K_NEIGHBOURS_COUNT = 5;
     private static double MASTER_DATASET_DELIMITER = 0.6;
     private static ArrayList<String> KNN_SELECTED_FEATURES;
-    private static String KNN_SELECTED_METRIC = Utils.KNN_METRIC_CORRELATION_COEFFICIENT;
+    private static String KNN_SELECTED_METRIC = Utils.KNN_METRIC_EUCLIDEAN;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -33,10 +29,9 @@ public class Main extends Application {
 //        primaryStage.show();
 
         // convert sgm files to txt and filter them
-        String projectDir = Paths.get("").toAbsolutePath().toString();
-        Path outputDir = Paths.get(projectDir + "\\data_txt").toAbsolutePath();
+        Path outputDir = Paths.get(PROJECT_DIRECTORY + "\\data_txt").toAbsolutePath();
         ArticleReader.checkIfDirExists(outputDir);
-        ArticleReader reader = new ArticleReader(Paths.get(projectDir + "\\data_sgm").toAbsolutePath(), outputDir);
+        ArticleReader reader = new ArticleReader(Paths.get(PROJECT_DIRECTORY + "\\data_sgm").toAbsolutePath(), outputDir);
         reader.extract();
 
         // stem text and generate articles collection
@@ -55,13 +50,12 @@ public class Main extends Application {
         featureExtractor.extract(articlesCollection, articleKeywords);
 
         // knn classification
-        KNN_SELECTED_FEATURES = new ArrayList<String>(10);
-        KNN_SELECTED_FEATURES.add(SHORT_TOKENS);
-        KNN_SELECTED_FEATURES.add(AVERAGE_LENGTH);
-        KNN_SELECTED_FEATURES.add(KEYWORDS_FIRST_HALF);
-        KNN_SELECTED_FEATURES.add(UNIQUE_TOKENS);
+        KNN_SELECTED_FEATURES = new ArrayList<String>(Arrays.asList(
+                Utils.TOKENS, Utils.UNIQUE_TOKENS, Utils.SHORT_TOKENS, Utils.MEDIUM_TOKENS, Utils.LONG_TOKENS,
+                Utils.AVERAGE_LENGTH, Utils.NUMERICAL_TOKENS, Utils.KEYWORDS, Utils.KEYWORDS_FIRST_HALF, Utils.KEYWORDS_DENSITY
+        ));
         if (!KNN_SELECTED_FEATURES.isEmpty()) {
-            KnnClassifier knnClassifier = new KnnClassifier(K_NEIGHBOURS_COUNT, MASTER_DATASET_DELIMITER, KNN_SELECTED_FEATURES, KNN_SELECTED_METRIC, articlesCollection);
+            KnnClassifier knnClassifier = new KnnClassifier(K_NEIGHBOURS_COUNT, MASTER_DATASET_DELIMITER, KNN_SELECTED_FEATURES, KNN_SELECTED_METRIC, articlesCollection, PROJECT_DIRECTORY);
             knnClassifier.classify();
         }
 

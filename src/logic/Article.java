@@ -10,6 +10,9 @@ public class Article {
     private double[] features;
     private ArrayList<String> knnEuclideanPlaces;
     private ArrayList<String> knnManhattanPlaces;
+    private ArrayList<String> knnChebyshevPlaces;
+    private ArrayList<String> knnCanberraPlaces;
+    private ArrayList<String> knnCorrelationPlaces;
 
     public Article() {}
 
@@ -73,6 +76,30 @@ public class Article {
 
     public ArrayList<String> getKnnManhattanPlaces() {
         return this.knnManhattanPlaces;
+    }
+
+    public void setKnnChebyshevPlaces(ArrayList<String> knnChebyshevPlaces) {
+        this.knnChebyshevPlaces = knnChebyshevPlaces;
+    }
+
+    public ArrayList<String> getKnnChebyshevPlaces() {
+        return this.knnChebyshevPlaces;
+    }
+
+    public void setKnnCanberraPlaces(ArrayList<String> knnCanberraPlaces) {
+        this.knnCanberraPlaces = knnCanberraPlaces;
+    }
+
+    public ArrayList<String> getKnnCanberraPlaces() {
+        return this.knnCanberraPlaces;
+    }
+
+    public void setKnnCorrelationPlaces(ArrayList<String> knnCorrelationPlaces) {
+        this.knnCorrelationPlaces = knnCorrelationPlaces;
+    }
+
+    public ArrayList<String> getKnnCorrelationPlaces() {
+        return this.knnCorrelationPlaces;
     }
 
     public double[] getFeaturesByIndices(int[] indexArray) {
