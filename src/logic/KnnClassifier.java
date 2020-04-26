@@ -214,33 +214,16 @@ public class KnnClassifier {
             typePlacesMap.put(PLACES_ACTUAL_KEY, actualPlaces);
             articleIdPlacesMap.put(testArticle.getArticleId(), typePlacesMap);
         }
+        /* Version with only 2 possible classes */
+        double accuracyPercentArticles = getAccuracyArticles(articleIdPlacesMap);
+        HashMap<String, Double> placePrecisionPercentArticlesMap = getPrecisionArticles(articleIdPlacesMap);
+        HashMap<String, Double> placeRecallPercentArticlesMap = getRecallArticles(articleIdPlacesMap);
+        /* Version with 6 possible classes (using confusion matrix) */
         int[][] confusionMatrix = createConfusionMatrix(articleIdPlacesMap);
-        System.out.println("Confusion matrix successfully generated:");
-        System.out.println("\t\t\t\t\tCanada\t\t\t\tFrance\t\t\tJapan\t\t\tUK\t\t\t\tUSA\t\t\t\tWest Germany");
-        for (int i = 0; i < 6; i++) {
-            for (int j = 0; j < 6; j++) {
-                if (i == 0 && j == 0) {
-                    System.out.print("Canada\t\t\t\t[" + i + "][" + j + "]" + " = " + confusionMatrix[i][j] + "\t\t\t");
-                } else if (i == 1 && j == 0) {
-                    System.out.print("France\t\t\t\t[" + i + "][" + j + "]" + " = " + confusionMatrix[i][j] + "\t\t\t");
-                } else if (i == 2 && j == 0) {
-                    System.out.print("Japan\t\t\t\t[" + i + "][" + j + "]" + " = " + confusionMatrix[i][j] + "\t\t\t");
-                } else if (i == 3 && j == 0) {
-                    System.out.print("UK\t\t\t\t\t[" + i + "][" + j + "]" + " = " + confusionMatrix[i][j] + "\t\t\t");
-                } else if (i == 4 && j == 0) {
-                    System.out.print("USA\t\t\t\t\t[" + i + "][" + j + "]" + " = " + confusionMatrix[i][j] + "\t\t\t");
-                } else if (i == 5 && j == 0) {
-                    System.out.print("West Germany\t\t[" + i + "][" + j + "]" + " = " + confusionMatrix[i][j] + "\t\t\t");
-                } else {
-                    System.out.print("[" + i + "][" + j + "]" + " = " + confusionMatrix[i][j] + "\t\t");
-                }
-            }
-            System.out.println();
-        }
         double accuracyPercent = getAccuracy(confusionMatrix) * 100;
         HashMap<String, Double> placePrecisionPercentMap = getPrecision(confusionMatrix);
         HashMap<String, Double> placeRecallPercentMap = getRecall(confusionMatrix);
-        saveExperimentResults(accuracyPercent, placePrecisionPercentMap, placeRecallPercentMap);
+        saveExperimentResults(accuracyPercent, placePrecisionPercentMap, placeRecallPercentMap, confusionMatrix, accuracyPercentArticles, placePrecisionPercentArticlesMap, placeRecallPercentArticlesMap);
     }
 
     private int[][] createConfusionMatrix(HashMap<Integer, HashMap<String, ArrayList<String>>> articleIdPlacesMap) {
@@ -335,6 +318,23 @@ public class KnnClassifier {
         return (double) matchesCounter / sumMatrixValues;
     }
 
+    private double getAccuracyArticles(HashMap<Integer, HashMap<String, ArrayList<String>>> articleIdPlacesMap) {
+        // count: correctly classified articles / size of classification set
+        int matchesCounter = 0;
+        for (int articleId : articleIdPlacesMap.keySet()) {
+            HashMap<String, ArrayList<String>> placesMap = articleIdPlacesMap.get(articleId);
+            ArrayList<String> predictedPlaces = placesMap.get(PLACES_PREDICTED_KEY);
+            ArrayList<String> actualPlaces = placesMap.get(PLACES_ACTUAL_KEY);
+            for (String actualPlace : actualPlaces) {
+                if (predictedPlaces.contains(actualPlace)) {
+                    matchesCounter++;
+                    break;
+                }
+            }
+        }
+        return (double) matchesCounter * 100 / articleIdPlacesMap.size();
+    }
+
     private HashMap<String, Double> getPrecision(int[][] confusionMatrix){
         HashMap<String, Double> placePrecisionMap = new HashMap<String, Double>();
         int rowIndex = 0;
@@ -361,6 +361,37 @@ public class KnnClassifier {
                 .collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2,
                         LinkedHashMap::new));
         return placePrecisionMap;
+    }
+
+    private HashMap<String, Double> getPrecisionArticles(HashMap<Integer, HashMap<String, ArrayList<String>>> articleIdPlacesMap) {
+        // count: correctly classified articles to place X / count of both correctly and incorrectly classified articles to place X
+        HashMap<String, Double> placePrecisionMap = new HashMap<String, Double>();
+        for (String place : PLACES) {
+            placePrecisionMap.put(place, countPrecision(articleIdPlacesMap, place));
+        }
+        placePrecisionMap = placePrecisionMap
+                .entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByKey())
+                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2,
+                        LinkedHashMap::new));
+        return placePrecisionMap;
+    }
+
+    private double countPrecision(HashMap<Integer, HashMap<String, ArrayList<String>>> articleIdPlacesMap, String placeToCheck) {
+        int placeMatchCounter = 0;
+        int mismatchCounter = 0;
+        for (HashMap<String, ArrayList<String>> placesMap : articleIdPlacesMap.values()) {
+            ArrayList<String> actualPlaces = placesMap.get(PLACES_ACTUAL_KEY);
+            ArrayList<String> predictedPlaces = placesMap.get(PLACES_PREDICTED_KEY);
+            if (actualPlaces.contains(placeToCheck) && predictedPlaces.contains(placeToCheck)) {
+                placeMatchCounter++;
+            } else if (!actualPlaces.contains(placeToCheck) && predictedPlaces.contains(placeToCheck)) {
+                mismatchCounter++;
+            }
+        }
+        if ((placeMatchCounter + mismatchCounter) == 0) return 0;
+        return (double) placeMatchCounter * 100 / (placeMatchCounter + mismatchCounter);
     }
 
     private HashMap<String, Double> getRecall(int[][] confusionMatrix){
@@ -391,7 +422,40 @@ public class KnnClassifier {
         return placeRecallMap;
     }
 
-    private void saveExperimentResults(double accuracyPercent, HashMap<String, Double> placePrecisionPercentMap, HashMap<String, Double> placeRecallPercentMap) {
+    private HashMap<String, Double> getRecallArticles(HashMap<Integer, HashMap<String, ArrayList<String>>> articleIdPlacesMap) {
+        // count: correctly classified articles to place X / count of articles with place X
+        HashMap<String, Double> placeRecallMap = new HashMap<String, Double>();
+        for (String place : PLACES) {
+            placeRecallMap.put(place, countRecall(articleIdPlacesMap, place));
+        }
+        placeRecallMap = placeRecallMap
+                .entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByKey())
+                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2,
+                        LinkedHashMap::new));
+        return placeRecallMap;
+    }
+
+    private double countRecall(HashMap<Integer, HashMap<String, ArrayList<String>>> articleIdPlacesMap, String placeToCheck) {
+        int placeMatchCounter = 0;
+        int actualPlaceCounter = 0;
+        for (HashMap<String, ArrayList<String>> placesMap : articleIdPlacesMap.values()) {
+            ArrayList<String> actualPlaces = placesMap.get(PLACES_ACTUAL_KEY);
+            ArrayList<String> predictedPlaces = placesMap.get(PLACES_PREDICTED_KEY);
+            if (actualPlaces.contains(placeToCheck)) {
+                actualPlaceCounter++;
+                if (predictedPlaces.contains(placeToCheck)) {
+                    placeMatchCounter++;
+                }
+            }
+        }
+        if (actualPlaceCounter == 0) return 0;
+        return (double) placeMatchCounter * 100 / actualPlaceCounter;
+    }
+
+    private void saveExperimentResults(double accuracyPercent, HashMap<String, Double> placePrecisionPercentMap, HashMap<String, Double> placeRecallPercentMap, int[][] confusionMatrix,
+                                       double accuracyPercentArticles, HashMap<String, Double> placePrecisionPercentArticlesMap, HashMap<String, Double> placeRecallPercentArticlesMap) {
         Charset utf8 = StandardCharsets.UTF_8;
         try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(projectDirectory + "\\knn_results\\output_" + System.currentTimeMillis() + ".log"), utf8))) {
             writer.write("*** KNN Algorithm Parameters ***\n");
@@ -405,6 +469,29 @@ public class KnnClassifier {
                 writer.write("\t" + selectedFeature + "\n");
             }
             writer.write("\n*** Classification Results ***\n");
+            writer.write("*** Confusion matrix regarding all possible classes ***\n");
+            writer.write("\t\t\t\t\tCanada\t\t\t\tFrance\t\t\tJapan\t\t\tUK\t\t\t\tUSA\t\t\t\tWest Germany\n");
+            for (int i = 0; i < 6; i++) {
+                for (int j = 0; j < 6; j++) {
+                    if (i == 0 && j == 0) {
+                        writer.write("Canada\t\t\t\t[" + i + "][" + j + "]" + " = " + confusionMatrix[i][j] + "\t\t\t");
+                    } else if (i == 1 && j == 0) {
+                        writer.write("France\t\t\t\t[" + i + "][" + j + "]" + " = " + confusionMatrix[i][j] + "\t\t\t");
+                    } else if (i == 2 && j == 0) {
+                        writer.write("Japan\t\t\t\t[" + i + "][" + j + "]" + " = " + confusionMatrix[i][j] + "\t\t\t");
+                    } else if (i == 3 && j == 0) {
+                        writer.write("UK\t\t\t\t\t[" + i + "][" + j + "]" + " = " + confusionMatrix[i][j] + "\t\t\t");
+                    } else if (i == 4 && j == 0) {
+                        writer.write("USA\t\t\t\t\t[" + i + "][" + j + "]" + " = " + confusionMatrix[i][j] + "\t\t\t");
+                    } else if (i == 5 && j == 0) {
+                        writer.write("West Germany\t\t[" + i + "][" + j + "]" + " = " + confusionMatrix[i][j] + "\t\t\t");
+                    } else {
+                        writer.write("[" + i + "][" + j + "]" + " = " + confusionMatrix[i][j] + "\t\t");
+                    }
+                }
+                writer.write("\n");
+            }
+            writer.write("\n*** Classification Results Computed On The Basis Of Confusion Matrix ***\n");
             writer.write("accuracy: " + String.format("%.2f", accuracyPercent) + "%\n");
             writer.write("precision: \n");
             for (String place : placePrecisionPercentMap.keySet()) {
@@ -413,6 +500,16 @@ public class KnnClassifier {
             writer.write("recall: \n");
             for (String place : placeRecallPercentMap.keySet()) {
                 writer.write("\t" + place + " => " + String.format("%.2f", placeRecallPercentMap.get(place)) + "%\n");
+            }
+            writer.write("\n*** Classification Results Computed On The Basis Of Only Two Possible Status - Classified Correctly and Incorrectly ***\n");
+            writer.write("accuracy: " + String.format("%.2f", accuracyPercentArticles) + "%\n");
+            writer.write("precision: \n");
+            for (String place : placePrecisionPercentArticlesMap.keySet()) {
+                writer.write("\t" + place + " => " + String.format("%.2f", placePrecisionPercentArticlesMap.get(place)) + "%\n");
+            }
+            writer.write("recall: \n");
+            for (String place : placeRecallPercentArticlesMap.keySet()) {
+                writer.write("\t" + place + " => " + String.format("%.2f", placeRecallPercentArticlesMap.get(place)) + "%\n");
             }
         } catch (IOException e) {
             System.err.format("IOException: %s%n", e);
