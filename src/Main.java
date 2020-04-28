@@ -1,8 +1,8 @@
 import logic.*;
-import logic.text_processing.ArticleReader;
-import logic.text_processing.TextAnalyzer;
-import logic.tokens_processing.FeatureExtractor;
-import logic.tokens_processing.TfidfAnalyzer;
+import text_processing.ArticleReader;
+import text_processing.TextAnalyzer;
+import tokens_processing.FeatureExtractor;
+import tokens_processing.TfidfAnalyzer;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -47,16 +47,16 @@ public class Main {
         int kNeighboursCount = 3;
         double masterDatasetDelimiter = 0.6;
         ArrayList<String> articleFeatures = new ArrayList<String>(Arrays.asList(
-                Utils.TOKENS, Utils.UNIQUE_TOKENS, Utils.SHORT_TOKENS, Utils.MEDIUM_TOKENS, Utils.LONG_TOKENS,
-                Utils.AVERAGE_LENGTH, Utils.NUMERICAL_TOKENS, Utils.KEYWORDS, Utils.KEYWORDS_FIRST_HALF, Utils.KEYWORDS_DENSITY
+                Utils.UNIQUE_TOKENS, Utils.SHORT_TOKENS, Utils.MEDIUM_TOKENS, Utils.LONG_TOKENS,
+                Utils.AVERAGE_LENGTH, Utils.NUMERICAL_TOKENS, Utils.KEYWORDS_FIRST_HALF, logic.Utils.KEYWORDS_DENSITY
         ));
         // knn classification for k = 3;
-        KnnClassifier knnClassifier = new KnnClassifier(kNeighboursCount, masterDatasetDelimiter, articleFeatures, Utils.KNN_METRIC_CHEBYSHEV, articlesCollection, PROJECT_DIRECTORY);
+        KnnClassifier knnClassifier = new KnnClassifier(kNeighboursCount, masterDatasetDelimiter, articleFeatures, Utils.KNN_METRIC_CANBERRA, articlesCollection, PROJECT_DIRECTORY);
         knnClassifier.classify();
         // experiment nr 1 - classify articles for 10 different k values
 //        for (int counter = 1; counter < 10; counter++) {
 //            kNeighboursCount += 2;
-//            knnClassifier.setKnnParameters(kNeighboursCount, masterDatasetDelimiter, articleFeatures, Utils.KNN_METRIC_CORRELATION_COEFFICIENT);
+//            knnClassifier.setKnnParameters(kNeighboursCount, masterDatasetDelimiter, articleFeatures, logic.Utils.KNN_METRIC_CANBERRA);
 //            knnClassifier.classify();
 //        }
     }

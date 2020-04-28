@@ -1,6 +1,7 @@
 package logic;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Article {
     public int id;
@@ -16,12 +17,6 @@ public class Article {
 
     public Article() {}
 
-    public Article(String originalBody, ArrayList<String> places, ArrayList<String> bodyTokens) {
-        this.originalBody = originalBody;
-        this.places = places;
-        this.bodyTokens = bodyTokens;
-    }
-
     public void setId(int articleId) {
         this.id = articleId;
     }
@@ -32,10 +27,6 @@ public class Article {
 
     public void setOriginalBody(String originalBody) {
         this.originalBody = originalBody;
-    }
-
-    public String getOriginalBody() {
-        return this.originalBody;
     }
 
     public void setPlaces(ArrayList<String> places) {

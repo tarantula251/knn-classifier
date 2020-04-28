@@ -1,10 +1,8 @@
 package logic;
 
-import logic.metrics.*;
+import metrics.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.math3.distribution.NormalDistribution;
-import org.apache.commons.math3.distribution.RealDistribution;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import java.io.*;
@@ -75,22 +73,27 @@ public class KnnClassifier {
 
     private void normalizeFeatures() {
         for (Article article : articlesCollection) {
-            double[] featuresArray = article.getFeatures();
-            double[] normalizedFeaturesArray = calculateNormalizedValues(new DescriptiveStatistics(featuresArray), new NormalDistribution());
+            double[] featuresArray = article.getFeaturesByIndices(selectedFeaturesIndices);
+            double[] normalizedFeaturesArray = calculateNormalizedValues(new DescriptiveStatistics(featuresArray));
             if (normalizedFeaturesArray.length > 0) {
                 article.setFeatures(normalizedFeaturesArray);
             }
         }
     }
 
-    private double[] calculateNormalizedValues(DescriptiveStatistics descriptiveStatistics, RealDistribution realDistribution) {
+    private double[] calculateNormalizedValues(DescriptiveStatistics descriptiveStatistics) {
         double[] normalizedFeatures = new double[(int) descriptiveStatistics.getN()];
         double standardDeviation = descriptiveStatistics.getStandardDeviation();
-        double mean = descriptiveStatistics.getMean();
+        double mean = 0;
+        double[] sortedFeatures = descriptiveStatistics.getSortedValues();
+        if (sortedFeatures.length % 2 != 0) {
+            mean = sortedFeatures[(sortedFeatures.length - 1) / 2];
+        } else {
+            mean = (sortedFeatures[(sortedFeatures.length / 2) - 1] + sortedFeatures[sortedFeatures.length / 2]) / 2;
+        }
         for (int featureIndex = 0; featureIndex < descriptiveStatistics.getN(); ++featureIndex) {
             double zScore = (descriptiveStatistics.getElement(featureIndex) - mean) / standardDeviation;
-            double normalizedZScore = 1.0 - realDistribution.cumulativeProbability(Math.abs(zScore));
-            normalizedFeatures[featureIndex] = normalizedZScore;
+            normalizedFeatures[featureIndex] = zScore;
         }
         return normalizedFeatures;
     }
@@ -148,19 +151,19 @@ public class KnnClassifier {
         HashMap<Article, Double> masterArticleDistanceMap = new HashMap<Article, Double>();
         if (metricName.equals(Utils.KNN_METRIC_EUCLIDEAN)) {
             EuclideanMetric euclideanMetric = new EuclideanMetric();
-            masterArticleDistanceMap = euclideanMetric.measureDistance(testArticle, masterArticles, selectedFeaturesIndices);
+            masterArticleDistanceMap = euclideanMetric.measureDistance(testArticle, masterArticles);
         } else if (metricName.equals(Utils.KNN_METRIC_MANHATTAN)) {
             ManhattanMetric manhattanMetric = new ManhattanMetric();
-            masterArticleDistanceMap = manhattanMetric.measureDistance(testArticle, masterArticles, selectedFeaturesIndices);
+            masterArticleDistanceMap = manhattanMetric.measureDistance(testArticle, masterArticles);
         } else if (metricName.equals(Utils.KNN_METRIC_CHEBYSHEV)) {
             ChebyshevMetric chebyshevMetric = new ChebyshevMetric();
-            masterArticleDistanceMap = chebyshevMetric.measureDistance(testArticle, masterArticles, selectedFeaturesIndices);
+            masterArticleDistanceMap = chebyshevMetric.measureDistance(testArticle, masterArticles);
         } else if (metricName.equals(Utils.KNN_METRIC_CANBERRA)) {
             CanberraMetric canberraMetric = new CanberraMetric();
-            masterArticleDistanceMap = canberraMetric.measureDistance(testArticle, masterArticles, selectedFeaturesIndices);
+            masterArticleDistanceMap = canberraMetric.measureDistance(testArticle, masterArticles);
         } else if (metricName.equals(Utils.KNN_METRIC_CORRELATION_COEFFICIENT)) {
             CorrelationCoefficientMetric correlationCoefficientMetric = new CorrelationCoefficientMetric();
-            masterArticleDistanceMap = correlationCoefficientMetric.measureDistance(testArticle, masterArticles, selectedFeaturesIndices);
+            masterArticleDistanceMap = correlationCoefficientMetric.measureDistance(testArticle, masterArticles);
         }
         return masterArticleDistanceMap;
     }

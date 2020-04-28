@@ -1,4 +1,4 @@
-package logic.metrics;
+package metrics;
 
 import logic.Article;
 
@@ -7,11 +7,11 @@ import java.util.HashMap;
 
 public class ManhattanMetric {
 
-    public HashMap<Article, Double> measureDistance(Article testArticle, ArrayList<Article> masterArticles, int[] selectedFeaturesIndices) {
+    public HashMap<Article, Double> measureDistance(Article testArticle, ArrayList<Article> masterArticles) {
         HashMap<Article, Double> masterArticleDistanceMap = new HashMap<Article, Double>();
-        double[] testFeatures = testArticle.getFeaturesByIndices(selectedFeaturesIndices);
+        double[] testFeatures = testArticle.getFeatures();
         for (Article masterArticle : masterArticles) {
-            double[] masterFeatures = masterArticle.getFeaturesByIndices(selectedFeaturesIndices);
+            double[] masterFeatures = masterArticle.getFeatures();
             double distance = calculateManhattanDistance(testFeatures, masterFeatures);
             masterArticleDistanceMap.put(masterArticle, distance);
         }

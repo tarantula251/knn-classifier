@@ -1,4 +1,4 @@
-package logic.text_processing;
+package text_processing;
 
 import logic.Article;
 import org.apache.lucene.analysis.CharArraySet;

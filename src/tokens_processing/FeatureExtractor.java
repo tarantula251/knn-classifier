@@ -1,4 +1,4 @@
-package logic.tokens_processing;
+package tokens_processing;
 
 import logic.Article;
 import org.apache.commons.collections4.CollectionUtils;

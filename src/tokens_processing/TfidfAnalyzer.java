@@ -1,4 +1,4 @@
-package logic.tokens_processing;
+package tokens_processing;
 
 import java.util.*;
 
