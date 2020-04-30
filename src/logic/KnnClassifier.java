@@ -41,6 +41,7 @@ public class KnnClassifier {
         this.articlesCollection = articlesCollection;
         this.projectDirectory = projectDir;
         setKnnParameters(k, masterDatasetDelimiter, selectedFeatures, metricName);
+        normalizeFeatures();
     }
 
     public void setKnnParameters(int k, double masterDatasetDelimiter, ArrayList<String> selectedFeatures, String metricName) {
@@ -62,7 +63,6 @@ public class KnnClassifier {
     }
 
     public void classify() {
-        normalizeFeatures();
         // perform classification
         for (Article testArticle : testArticles) {
             classify(testArticle);
@@ -73,7 +73,7 @@ public class KnnClassifier {
 
     private void normalizeFeatures() {
         for (Article article : articlesCollection) {
-            double[] featuresArray = article.getFeaturesByIndices(selectedFeaturesIndices);
+            double[] featuresArray = article.getFeatures();
             double[] normalizedFeaturesArray = calculateNormalizedValues(new DescriptiveStatistics(featuresArray));
             if (normalizedFeaturesArray.length > 0) {
                 article.setFeatures(normalizedFeaturesArray);
