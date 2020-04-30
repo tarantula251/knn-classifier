@@ -83,9 +83,9 @@ public class Main {
         int kNeighboursCount = 9;
         double masterDatasetDelimiter = 0.85;
         for (int counter = 0; counter < 5; counter++) {
-            masterDatasetDelimiter -= 0.1;
             knnClassifier.setKnnParameters(kNeighboursCount, masterDatasetDelimiter, articleFeatures, Utils.KNN_METRIC_CANBERRA);
             knnClassifier.classify();
+            masterDatasetDelimiter -= 0.1;
         }
         System.out.println("Experiment nr 2 finished!");
     }
