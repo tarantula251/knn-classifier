@@ -47,17 +47,79 @@ public class Main {
         int kNeighboursCount = 3;
         double masterDatasetDelimiter = 0.6;
         ArrayList<String> articleFeatures = new ArrayList<String>(Arrays.asList(
-                Utils.UNIQUE_TOKENS, Utils.SHORT_TOKENS, Utils.MEDIUM_TOKENS, Utils.LONG_TOKENS,
-                Utils.AVERAGE_LENGTH, Utils.NUMERICAL_TOKENS, Utils.KEYWORDS_FIRST_HALF, logic.Utils.KEYWORDS_DENSITY
+                Utils.TOKENS, Utils.UNIQUE_TOKENS, Utils.SHORT_TOKENS, Utils.MEDIUM_TOKENS, Utils.LONG_TOKENS,
+                Utils.AVERAGE_LENGTH, Utils.NUMERICAL_TOKENS, Utils.KEYWORDS, Utils.KEYWORDS_FIRST_HALF, Utils.KEYWORDS_DENSITY
         ));
-        // knn classification for k = 3;
-        KnnClassifier knnClassifier = new KnnClassifier(kNeighboursCount, masterDatasetDelimiter, articleFeatures, Utils.KNN_METRIC_CANBERRA, articlesCollection, PROJECT_DIRECTORY);
-        knnClassifier.classify();
+        System.out.println("Experiment nr 1 began.");
         // experiment nr 1 - classify articles for 10 different k values
-//        for (int counter = 1; counter < 10; counter++) {
-//            kNeighboursCount += 2;
-//            knnClassifier.setKnnParameters(kNeighboursCount, masterDatasetDelimiter, articleFeatures, logic.Utils.KNN_METRIC_CANBERRA);
-//            knnClassifier.classify();
-//        }
+        // knn classification for k = 3;
+        KnnClassifier knnClassifier = new KnnClassifier(kNeighboursCount, masterDatasetDelimiter, articleFeatures, Utils.KNN_METRIC_EUCLIDEAN, articlesCollection, PROJECT_DIRECTORY);
+        knnClassifier.classify();
+        performExperiment1(knnClassifier, articleFeatures);
+
+        // experiment nr 2 - classify articles for 5 different masterDatasetDelimiter values
+        performExperiment2(knnClassifier, articleFeatures);
+
+        // experiment nr 3 - classify articles for 5 different metric values
+        performExperiment3(knnClassifier, articleFeatures);
+
+        // experiment nr 4 - classify articles for 5 different sets of features
+        performExperiment4(knnClassifier);
+    }
+
+    private static void performExperiment1(KnnClassifier knnClassifier, ArrayList<String> articleFeatures) {
+        int kNeighboursCount = 3;
+        double masterDatasetDelimiter = 0.6;
+        for (int counter = 1; counter < 10; counter++) {
+            kNeighboursCount += 2;
+            knnClassifier.setKnnParameters(kNeighboursCount, masterDatasetDelimiter, articleFeatures, Utils.KNN_METRIC_EUCLIDEAN);
+            knnClassifier.classify();
+        }
+        System.out.println("Experiment nr 1 finished!");
+    }
+
+    private static void performExperiment2(KnnClassifier knnClassifier, ArrayList<String> articleFeatures) {
+        System.out.println("Experiment nr 2 began.");
+        int kNeighboursCount = 9;
+        double masterDatasetDelimiter = 0.85;
+        for (int counter = 0; counter < 5; counter++) {
+            masterDatasetDelimiter -= 0.1;
+            knnClassifier.setKnnParameters(kNeighboursCount, masterDatasetDelimiter, articleFeatures, Utils.KNN_METRIC_CANBERRA);
+            knnClassifier.classify();
+        }
+        System.out.println("Experiment nr 2 finished!");
+    }
+
+    private static void performExperiment3(KnnClassifier knnClassifier, ArrayList<String> articleFeatures) {
+        System.out.println("Experiment nr 3 began.");
+        int kNeighboursCount = 9;
+        double masterDatasetDelimiter = 0.65;
+        HashMap<Integer, String> counterMetricMap = new HashMap<>();
+        counterMetricMap.put(0, Utils.KNN_METRIC_EUCLIDEAN);
+        counterMetricMap.put(1, Utils.KNN_METRIC_MANHATTAN);
+        counterMetricMap.put(2, Utils.KNN_METRIC_CHEBYSHEV);
+        counterMetricMap.put(3, Utils.KNN_METRIC_CANBERRA);
+        counterMetricMap.put(4, Utils.KNN_METRIC_CORRELATION_COEFFICIENT);
+        for (int counter = 0; counter < 5; counter++) {
+            knnClassifier.setKnnParameters(kNeighboursCount, masterDatasetDelimiter, articleFeatures, counterMetricMap.get(counter));
+            knnClassifier.classify();
+        }
+        System.out.println("Experiment nr 3 finished!");
+    }
+
+    private static void performExperiment4(KnnClassifier knnClassifier) {
+        System.out.println("Experiment nr 4 began.");
+        int kNeighboursCount = 9;
+        double masterDatasetDelimiter = 0.65;
+        HashMap<Integer, ArrayList<String>> counterFeaturesMap = new HashMap<>();
+        counterFeaturesMap.put(0, new ArrayList<String>(Arrays.asList(Utils.TOKENS, Utils.SHORT_TOKENS, Utils.LONG_TOKENS, Utils.NUMERICAL_TOKENS, Utils.KEYWORDS_FIRST_HALF)));
+        counterFeaturesMap.put(1, new ArrayList<String>(Arrays.asList(Utils.UNIQUE_TOKENS, Utils.MEDIUM_TOKENS, Utils.AVERAGE_LENGTH, Utils.KEYWORDS, Utils.KEYWORDS_DENSITY)));
+        counterFeaturesMap.put(2, new ArrayList<String>(Arrays.asList(Utils.TOKENS, Utils.MEDIUM_TOKENS, Utils.LONG_TOKENS, Utils.AVERAGE_LENGTH, Utils.KEYWORDS_FIRST_HALF, Utils.KEYWORDS_DENSITY)));
+        counterFeaturesMap.put(3, new ArrayList<String>(Arrays.asList(Utils.UNIQUE_TOKENS, Utils.SHORT_TOKENS, Utils.NUMERICAL_TOKENS, Utils.KEYWORDS)));
+        for (int counter = 0; counter < 4; counter++) {
+            knnClassifier.setKnnParameters(kNeighboursCount, masterDatasetDelimiter, counterFeaturesMap.get(counter), Utils.KNN_METRIC_CHEBYSHEV);
+            knnClassifier.classify();
+        }
+        System.out.println("Experiment nr 4 finished!");
     }
 }
