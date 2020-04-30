@@ -44,7 +44,7 @@ public class Main {
     }
 
     private static void performKnnClassification(ArrayList<Article> articlesCollection) {
-        int kNeighboursCount = 3;
+        int kNeighboursCount = 5;
         double masterDatasetDelimiter = 0.6;
         ArrayList<String> articleFeatures = new ArrayList<String>(Arrays.asList(
                 Utils.TOKENS, Utils.UNIQUE_TOKENS, Utils.SHORT_TOKENS, Utils.MEDIUM_TOKENS, Utils.LONG_TOKENS,
@@ -52,7 +52,7 @@ public class Main {
         ));
         System.out.println("Experiment nr 1 began.");
         // experiment nr 1 - classify articles for 10 different k values
-        // knn classification for k = 3;
+        // knn classification for k = 5;
         KnnClassifier knnClassifier = new KnnClassifier(kNeighboursCount, masterDatasetDelimiter, articleFeatures, Utils.KNN_METRIC_EUCLIDEAN, articlesCollection, PROJECT_DIRECTORY);
         knnClassifier.classify();
         performExperiment1(knnClassifier, articleFeatures);
@@ -68,12 +68,18 @@ public class Main {
     }
 
     private static void performExperiment1(KnnClassifier knnClassifier, ArrayList<String> articleFeatures) {
-        int kNeighboursCount = 3;
+        int kNeighboursCount = 7;
         double masterDatasetDelimiter = 0.6;
         for (int counter = 1; counter < 10; counter++) {
-            kNeighboursCount += 2;
+            if (kNeighboursCount == 9 || kNeighboursCount == 10 || kNeighboursCount == 11 || kNeighboursCount == 12) {
+                kNeighboursCount--;
+            }
+            if (kNeighboursCount == 17 || kNeighboursCount == 20) {
+                kNeighboursCount++;
+            }
             knnClassifier.setKnnParameters(kNeighboursCount, masterDatasetDelimiter, articleFeatures, Utils.KNN_METRIC_EUCLIDEAN);
             knnClassifier.classify();
+            kNeighboursCount += 2;
         }
         System.out.println("Experiment nr 1 finished!");
     }
