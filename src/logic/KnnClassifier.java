@@ -49,6 +49,7 @@ public class KnnClassifier {
         this.k = k;
         this.masterDatasetDelimiter = masterDatasetDelimiter;
         splitArticles(masterDatasetDelimiter);
+        System.out.println("test arts : "+testArticles.size());
         this.selectedFeatures = selectedFeatures;
         this.selectedFeaturesIndices = Utils.getTokensIndices(selectedFeatures);
         this.metricName = metricName;
@@ -242,79 +243,31 @@ public class KnnClassifier {
     private int[][] createConfusionMatrix(HashMap<Integer, HashMap<String, ArrayList<String>>> articleIdPlacesMap) {
         int[][] confusionMatrix = new int[6][6];
         if (!articleIdPlacesMap.isEmpty()) {
-            HashMap<String, Integer> canadaCounterMap = countPlacesForConfusionMatrix(articleIdPlacesMap, PLACE_CANADA);
-            HashMap<String, Integer> franceCounterMap = countPlacesForConfusionMatrix(articleIdPlacesMap, PLACE_FRANCE);
-            HashMap<String, Integer> japanCounterMap = countPlacesForConfusionMatrix(articleIdPlacesMap, PLACE_JAPAN);
-            HashMap<String, Integer> ukCounterMap = countPlacesForConfusionMatrix(articleIdPlacesMap, PLACE_UK);
-            HashMap<String, Integer> usaCounterMap = countPlacesForConfusionMatrix(articleIdPlacesMap, PLACE_USA);
-            HashMap<String, Integer> westGermanyCounterMap = countPlacesForConfusionMatrix(articleIdPlacesMap, PLACE_WEST_GERMANY);
-            ArrayList<HashMap<String, Integer>> placeMapList = new ArrayList<HashMap<String, Integer>>(Arrays.asList(canadaCounterMap, franceCounterMap, japanCounterMap, ukCounterMap, usaCounterMap, westGermanyCounterMap));
-            if (!placeMapList.isEmpty()) {
-                int rowIndex = 0;
-                for (HashMap<String, Integer> placeCounterMap : placeMapList) {
-                    int columnIndex = 0;
-                    for (String place : PLACES) {
-                        confusionMatrix[rowIndex][columnIndex] = placeCounterMap.get(place);
-                        columnIndex++;
-                    }
-                    rowIndex++;
+            //row - predicted value
+            int rowIndex = 0;
+            for (String predictedPlace : PLACES) {
+                int columnIndex = 0;
+                //column - actual value
+                for (String actualPlace : PLACES) {
+                    confusionMatrix[rowIndex][columnIndex] = countPlacesForConfusionMatrix(articleIdPlacesMap, predictedPlace, actualPlace);
+                    columnIndex++;
                 }
+                rowIndex++;
             }
         }
         return confusionMatrix;
     }
 
-    private HashMap<String, Integer> countPlacesForConfusionMatrix(HashMap<Integer, HashMap<String, ArrayList<String>>> articleIdPlacesMap, String placeToCheck) {
-        int placeMatchCounter = 0;
-        int westGermanyMismatchCounter = 0;
-        int usaMismatchCounter = 0;
-        int franceMismatchCounter = 0;
-        int ukMismatchCounter = 0;
-        int canadaMismatchCounter = 0;
-        int japanMismatchCounter = 0;
+    private int countPlacesForConfusionMatrix(HashMap<Integer, HashMap<String, ArrayList<String>>> articleIdPlacesMap, String predictedPlace, String actualPlace) {
+        int placeCounter = 0;
         for (HashMap<String, ArrayList<String>> placesMap : articleIdPlacesMap.values()) {
             ArrayList<String> actualPlaces = placesMap.get(PLACES_ACTUAL_KEY);
             ArrayList<String> predictedPlaces = placesMap.get(PLACES_PREDICTED_KEY);
-            if (actualPlaces.contains(placeToCheck) && predictedPlaces.contains(placeToCheck)) {
-                placeMatchCounter++;
-            } else {
-                if (!actualPlaces.contains(placeToCheck) && predictedPlaces.contains(placeToCheck)) {
-                    if (actualPlaces.contains(PLACE_CANADA)) {
-                        canadaMismatchCounter++;
-                    } else if (actualPlaces.contains(PLACE_FRANCE)) {
-                        franceMismatchCounter++;
-                    } else if (actualPlaces.contains(PLACE_JAPAN)) {
-                        japanMismatchCounter++;
-                    } else if (actualPlaces.contains(PLACE_UK)) {
-                        ukMismatchCounter++;
-                    } else if (actualPlaces.contains(PLACE_USA)) {
-                        usaMismatchCounter++;
-                    } else if (actualPlaces.contains(PLACE_WEST_GERMANY)) {
-                        westGermanyMismatchCounter++;
-                    }
-                }
+            if (predictedPlaces.contains(predictedPlace) && actualPlaces.contains(actualPlace)) {
+                placeCounter++;
             }
         }
-        HashMap<String, Integer> counterMap = new HashMap<String, Integer>();
-        if (!placeToCheck.equals(PLACE_CANADA)) counterMap.put(PLACE_CANADA, canadaMismatchCounter);
-        else counterMap.put(PLACE_CANADA, placeMatchCounter);
-        if (!placeToCheck.equals(PLACE_FRANCE)) counterMap.put(PLACE_FRANCE, franceMismatchCounter);
-        else counterMap.put(PLACE_FRANCE, placeMatchCounter);
-        if (!placeToCheck.equals(PLACE_JAPAN)) counterMap.put(PLACE_JAPAN, japanMismatchCounter);
-        else counterMap.put(PLACE_JAPAN, placeMatchCounter);
-        if (!placeToCheck.equals(PLACE_UK)) counterMap.put(PLACE_UK, ukMismatchCounter);
-        else counterMap.put(PLACE_UK, placeMatchCounter);
-        if (!placeToCheck.equals(PLACE_USA)) counterMap.put(PLACE_USA, usaMismatchCounter);
-        else counterMap.put(PLACE_USA, placeMatchCounter);
-        if (!placeToCheck.equals(PLACE_WEST_GERMANY)) counterMap.put(PLACE_WEST_GERMANY, westGermanyMismatchCounter);
-        else counterMap.put(PLACE_WEST_GERMANY, placeMatchCounter);
-        counterMap = counterMap
-                .entrySet()
-                .stream()
-                .sorted(Map.Entry.comparingByKey())
-                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2,
-                                LinkedHashMap::new));
-        return counterMap;
+        return placeCounter;
     }
 
     private double getAccuracy(int[][] confusionMatrix) {
@@ -476,6 +429,7 @@ public class KnnClassifier {
             double masterDataPercent = this.masterDatasetDelimiter * 100;
             double testDataPercent = (1 - this.masterDatasetDelimiter) * 100;
             writer.write("dataset division (master / test): " + String.format("%.2f", masterDataPercent) + "% / " + String.format("%.2f", testDataPercent) + "%\n");
+            writer.write("test dataset size: " + testArticles.size() + "%\n");
             writer.write("selected metric: " + this.metricName + "\n");
             writer.write("selected features: \n");
             for (String selectedFeature : this.selectedFeatures) {
@@ -487,19 +441,19 @@ public class KnnClassifier {
             for (int i = 0; i < 6; i++) {
                 for (int j = 0; j < 6; j++) {
                     if (i == 0 && j == 0) {
-                        writer.write("Canada\t\t\t\t[" + i + "][" + j + "]" + " = " + confusionMatrix[i][j] + "\t\t\t");
+                        writer.write("Canada\t\t\t\t" + confusionMatrix[i][j] + "\t\t\t");
                     } else if (i == 1 && j == 0) {
-                        writer.write("France\t\t\t\t[" + i + "][" + j + "]" + " = " + confusionMatrix[i][j] + "\t\t\t");
+                        writer.write("France\t\t\t\t" + confusionMatrix[i][j] + "\t\t\t");
                     } else if (i == 2 && j == 0) {
-                        writer.write("Japan\t\t\t\t[" + i + "][" + j + "]" + " = " + confusionMatrix[i][j] + "\t\t\t");
+                        writer.write("Japan\t\t\t\t" + confusionMatrix[i][j] + "\t\t\t");
                     } else if (i == 3 && j == 0) {
-                        writer.write("UK\t\t\t\t\t[" + i + "][" + j + "]" + " = " + confusionMatrix[i][j] + "\t\t\t");
+                        writer.write("UK\t\t\t\t\t" + confusionMatrix[i][j] + "\t\t\t");
                     } else if (i == 4 && j == 0) {
-                        writer.write("USA\t\t\t\t\t[" + i + "][" + j + "]" + " = " + confusionMatrix[i][j] + "\t\t\t");
+                        writer.write("USA\t\t\t\t\t" + confusionMatrix[i][j] + "\t\t\t");
                     } else if (i == 5 && j == 0) {
-                        writer.write("West Germany\t\t[" + i + "][" + j + "]" + " = " + confusionMatrix[i][j] + "\t\t\t");
+                        writer.write("West Germany\t\t" + confusionMatrix[i][j] + "\t\t\t");
                     } else {
-                        writer.write("[" + i + "][" + j + "]" + " = " + confusionMatrix[i][j] + "\t\t");
+                        writer.write(confusionMatrix[i][j] + "\t\t");
                     }
                 }
                 writer.write("\n");
