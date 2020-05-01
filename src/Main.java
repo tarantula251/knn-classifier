@@ -118,10 +118,10 @@ public class Main {
         int kNeighboursCount = 9;
         double masterDatasetDelimiter = 0.65;
         HashMap<Integer, ArrayList<String>> counterFeaturesMap = new HashMap<>();
-        counterFeaturesMap.put(0, new ArrayList<String>(Arrays.asList(Utils.TOKENS, Utils.SHORT_TOKENS, Utils.LONG_TOKENS, Utils.NUMERICAL_TOKENS, Utils.KEYWORDS_FIRST_HALF)));
-        counterFeaturesMap.put(1, new ArrayList<String>(Arrays.asList(Utils.UNIQUE_TOKENS, Utils.MEDIUM_TOKENS, Utils.AVERAGE_LENGTH, Utils.KEYWORDS, Utils.KEYWORDS_DENSITY)));
-        counterFeaturesMap.put(2, new ArrayList<String>(Arrays.asList(Utils.TOKENS, Utils.MEDIUM_TOKENS, Utils.LONG_TOKENS, Utils.AVERAGE_LENGTH, Utils.KEYWORDS_FIRST_HALF, Utils.KEYWORDS_DENSITY)));
-        counterFeaturesMap.put(3, new ArrayList<String>(Arrays.asList(Utils.UNIQUE_TOKENS, Utils.SHORT_TOKENS, Utils.NUMERICAL_TOKENS, Utils.KEYWORDS)));
+        counterFeaturesMap.put(0, new ArrayList<String>(Arrays.asList(Utils.TOKENS, Utils.SHORT_TOKENS, Utils.KEYWORDS_DENSITY)));
+        counterFeaturesMap.put(1, new ArrayList<String>(Arrays.asList(Utils.UNIQUE_TOKENS, Utils.AVERAGE_LENGTH, Utils.NUMERICAL_TOKENS)));
+        counterFeaturesMap.put(2, new ArrayList<String>(Arrays.asList(Utils.UNIQUE_TOKENS, Utils.LONG_TOKENS, Utils.KEYWORDS_FIRST_HALF)));
+        counterFeaturesMap.put(3, new ArrayList<String>(Arrays.asList(Utils.MEDIUM_TOKENS, Utils.NUMERICAL_TOKENS, Utils.KEYWORDS)));
         for (int counter = 0; counter < 4; counter++) {
             knnClassifier.setKnnParameters(kNeighboursCount, masterDatasetDelimiter, counterFeaturesMap.get(counter), Utils.KNN_METRIC_CHEBYSHEV);
             knnClassifier.classify();

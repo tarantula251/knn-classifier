@@ -24,6 +24,7 @@ public class KnnClassifier {
     private ArrayList<Article> masterArticles;
     private ArrayList<Article> testArticles;
     private final String projectDirectory;
+    private ArrayList<Integer> normalizedArticlesIds;
 
     private final static String PLACES_PREDICTED_KEY = "Predicted";
     private final static String PLACES_ACTUAL_KEY = "Actual";
@@ -65,10 +66,19 @@ public class KnnClassifier {
     public void classify() {
         // perform classification
         for (Article testArticle : testArticles) {
+            clearClassificationFields(testArticle);
             classify(testArticle);
         }
         // create statistics
         generateStatistics();
+    }
+
+    private void clearClassificationFields(Article testArticle) {
+        if (testArticle.getKnnEuclideanPlaces() != null) testArticle.setKnnEuclideanPlaces(null);
+        if (testArticle.getKnnManhattanPlaces() != null) testArticle.setKnnManhattanPlaces(null);
+        if (testArticle.getKnnChebyshevPlaces() != null) testArticle.setKnnChebyshevPlaces(null);
+        if (testArticle.getKnnCanberraPlaces() != null) testArticle.setKnnCanberraPlaces(null);
+        if (testArticle.getKnnCorrelationPlaces() != null) testArticle.setKnnCorrelationPlaces(null);
     }
 
     private void normalizeFeatures() {
@@ -151,19 +161,19 @@ public class KnnClassifier {
         HashMap<Article, Double> masterArticleDistanceMap = new HashMap<Article, Double>();
         if (metricName.equals(Utils.KNN_METRIC_EUCLIDEAN)) {
             EuclideanMetric euclideanMetric = new EuclideanMetric();
-            masterArticleDistanceMap = euclideanMetric.measureDistance(testArticle, masterArticles);
+            masterArticleDistanceMap = euclideanMetric.measureDistance(testArticle, masterArticles, selectedFeaturesIndices);
         } else if (metricName.equals(Utils.KNN_METRIC_MANHATTAN)) {
             ManhattanMetric manhattanMetric = new ManhattanMetric();
-            masterArticleDistanceMap = manhattanMetric.measureDistance(testArticle, masterArticles);
+            masterArticleDistanceMap = manhattanMetric.measureDistance(testArticle, masterArticles, selectedFeaturesIndices);
         } else if (metricName.equals(Utils.KNN_METRIC_CHEBYSHEV)) {
             ChebyshevMetric chebyshevMetric = new ChebyshevMetric();
-            masterArticleDistanceMap = chebyshevMetric.measureDistance(testArticle, masterArticles);
+            masterArticleDistanceMap = chebyshevMetric.measureDistance(testArticle, masterArticles, selectedFeaturesIndices);
         } else if (metricName.equals(Utils.KNN_METRIC_CANBERRA)) {
             CanberraMetric canberraMetric = new CanberraMetric();
-            masterArticleDistanceMap = canberraMetric.measureDistance(testArticle, masterArticles);
+            masterArticleDistanceMap = canberraMetric.measureDistance(testArticle, masterArticles, selectedFeaturesIndices);
         } else if (metricName.equals(Utils.KNN_METRIC_CORRELATION_COEFFICIENT)) {
             CorrelationCoefficientMetric correlationCoefficientMetric = new CorrelationCoefficientMetric();
-            masterArticleDistanceMap = correlationCoefficientMetric.measureDistance(testArticle, masterArticles);
+            masterArticleDistanceMap = correlationCoefficientMetric.measureDistance(testArticle, masterArticles, selectedFeaturesIndices);
         }
         return masterArticleDistanceMap;
     }

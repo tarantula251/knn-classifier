@@ -7,11 +7,11 @@ import java.util.HashMap;
 
 public class CanberraMetric {
 
-    public HashMap<Article, Double> measureDistance(Article testArticle, ArrayList<Article> masterArticles) {
+    public HashMap<Article, Double> measureDistance(Article testArticle, ArrayList<Article> masterArticles, int[] selectedFeaturesIndices) {
         HashMap<Article, Double> masterArticleDistanceMap = new HashMap<Article, Double>();
-        double[] testFeatures = testArticle.getFeatures();
+        double[] testFeatures = testArticle.getFeaturesByIndices(selectedFeaturesIndices);
         for (Article masterArticle : masterArticles) {
-            double[] masterFeatures = masterArticle.getFeatures();
+            double[] masterFeatures = masterArticle.getFeaturesByIndices(selectedFeaturesIndices);
             double distance = calculateCanberraDistance(testFeatures, masterFeatures);
             masterArticleDistanceMap.put(masterArticle, distance);
         }
