@@ -53,7 +53,8 @@ public class Main {
         System.out.println("Experiment nr 1 began.");
         // experiment nr 1 - classify articles for 10 different k values
         // knn classification for k = 5;
-        KnnClassifier knnClassifier = new KnnClassifier(kNeighboursCount, masterDatasetDelimiter, articleFeatures, Utils.KNN_METRIC_EUCLIDEAN, articlesCollection, PROJECT_DIRECTORY);
+        KnnClassifier knnClassifier = new KnnClassifier(articlesCollection, PROJECT_DIRECTORY);
+        knnClassifier.setKnnParameters(kNeighboursCount, masterDatasetDelimiter, articleFeatures, Utils.KNN_METRIC_EUCLIDEAN);
         knnClassifier.classify();
         performExperiment1(knnClassifier, articleFeatures);
 
@@ -87,7 +88,7 @@ public class Main {
     private static void performExperiment2(KnnClassifier knnClassifier, ArrayList<String> articleFeatures) {
         System.out.println("Experiment nr 2 began.");
         int kNeighboursCount = 9;
-        double masterDatasetDelimiter = 0.85;
+        double masterDatasetDelimiter = 0.95;
         for (int counter = 0; counter < 5; counter++) {
             knnClassifier.setKnnParameters(kNeighboursCount, masterDatasetDelimiter, articleFeatures, Utils.KNN_METRIC_CANBERRA);
             knnClassifier.classify();

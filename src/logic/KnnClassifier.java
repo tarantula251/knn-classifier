@@ -37,11 +37,10 @@ public class KnnClassifier {
     private final static ArrayList<String> PLACES = new ArrayList<String>(Arrays.asList(PLACE_CANADA, PLACE_FRANCE, PLACE_JAPAN, PLACE_UK, PLACE_USA, PLACE_WEST_GERMANY));
 
 
-    public KnnClassifier(int k, double masterDatasetDelimiter, ArrayList<String> selectedFeatures, String metricName, ArrayList<Article> articlesCollection, String projectDir) {
+    public KnnClassifier(ArrayList<Article> articlesCollection, String projectDir) {
         Collections.shuffle(articlesCollection);
         this.articlesCollection = articlesCollection;
         this.projectDirectory = projectDir;
-        setKnnParameters(k, masterDatasetDelimiter, selectedFeatures, metricName);
         normalizeFeatures();
     }
 
@@ -49,7 +48,6 @@ public class KnnClassifier {
         this.k = k;
         this.masterDatasetDelimiter = masterDatasetDelimiter;
         splitArticles(masterDatasetDelimiter);
-        System.out.println("test arts : "+testArticles.size());
         this.selectedFeatures = selectedFeatures;
         this.selectedFeaturesIndices = Utils.getTokensIndices(selectedFeatures);
         this.metricName = metricName;
@@ -429,7 +427,7 @@ public class KnnClassifier {
             double masterDataPercent = this.masterDatasetDelimiter * 100;
             double testDataPercent = (1 - this.masterDatasetDelimiter) * 100;
             writer.write("dataset division (master / test): " + String.format("%.2f", masterDataPercent) + "% / " + String.format("%.2f", testDataPercent) + "%\n");
-            writer.write("test dataset size: " + testArticles.size() + "%\n");
+            writer.write("test dataset size: " + testArticles.size() + "\n");
             writer.write("selected metric: " + this.metricName + "\n");
             writer.write("selected features: \n");
             for (String selectedFeature : this.selectedFeatures) {
@@ -437,7 +435,7 @@ public class KnnClassifier {
             }
             writer.write("\n*** Classification Results ***\n");
             writer.write("*** Confusion matrix regarding all possible classes ***\n");
-            writer.write("\t\t\t\t\tCanada\t\t\t\tFrance\t\t\tJapan\t\t\tUK\t\t\t\tUSA\t\t\t\tWest Germany\n");
+            writer.write("\t\t\t\t\tCanada\t\tFrance\t\tJapan\t\tUK\t\t\tUSA\t\t\tWest Germany\n");
             for (int i = 0; i < 6; i++) {
                 for (int j = 0; j < 6; j++) {
                     if (i == 0 && j == 0) {
@@ -453,7 +451,7 @@ public class KnnClassifier {
                     } else if (i == 5 && j == 0) {
                         writer.write("West Germany\t\t" + confusionMatrix[i][j] + "\t\t\t");
                     } else {
-                        writer.write(confusionMatrix[i][j] + "\t\t");
+                        writer.write(confusionMatrix[i][j] + "\t\t\t");
                     }
                 }
                 writer.write("\n");
